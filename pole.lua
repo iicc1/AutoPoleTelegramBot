@@ -3,7 +3,7 @@ local redis = redis.connect('127.0.0.1', 6379)
 local test = false
 function tdbot_update_callback(data)
     if not test then 
-    	getChats(2^63 - 1, 0, 20, ok_cb)
+    	getChats(2^63 - 1, 0, 20, ok_cb)    -- Si está recién arrancado, cargar chats de TDCLI
     	test = true
     end
     if string.find(os.date("%X"), "00:00:0%d") and not redis:get("wait_time") then
@@ -12,13 +12,13 @@ function tdbot_update_callback(data)
         for _,chat in pairs(chatsTexts) do
             sendMessage(chat.id, chat.text) 
         end
-        redis:setex("wait_time", 10, true)
+        redis:setex("wait_time", 10, true)      -- Para que envíe solo un mensaje
     end
     return
 end
 
-function getChatsTexts()  -- Pon en este array los grupos que quieres que envíe el mensaje y que texto enviar
-    local tbl = {}  -- Los supergrupos deben empezar por -100xxx..., los grupos por -xxx... y los mensajes a usuarios sin "-"
+function getChatsTexts()    -- Pon en este array los grupos que quieres que envíe el mensaje y que texto enviar
+    local tbl = {}          -- Los supergrupos deben empezar por -100xxx..., los grupos por -xxx... y los mensajes a usuarios sin "-"
     tbl[1] = {}
     tbl[1].id = -100288288288 -- Ejemplo supergrupo/canal
     tbl[1].text = "Pole"
